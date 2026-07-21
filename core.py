@@ -1,24 +1,29 @@
 import json
-from validators import validate_input
 
-class MainProcessor:
-    def __init__(self):
-        self.data = []
+class DataProcessor:
+    def __init__(self, data):
+        self.data = data
 
-    def main_loop(self):
-        while True:
-            user_input = input('Enter data (or type exit to quit): ')
-            if user_input.lower() == 'exit':
-                break
-            if not validate_input(user_input):
-                print('Invalid input. Please try again.')
-                continue
-            self.process_data(user_input)
+    def process_data(self):
+        try:
+            self.validate_data()
+            result = self.perform_calculation()
+            return json.dumps(result)
+        except ValueError as e:
+            return json.dumps({'error': str(e)})
+        except TypeError as e:
+            return json.dumps({'error': 'Invalid data type: ' + str(e)})
+        except Exception as e:
+            return json.dumps({'error': 'An unexpected error occurred: ' + str(e)})
 
-    def process_data(self, data):
-        self.data.append(data)
-        print(f'Data processed: {data}')
+    def validate_data(self):
+        if not isinstance(self.data, list):
+            raise ValueError('Data must be a list.')
+        if not all(isinstance(i, (int, float)) for i in self.data):
+            raise ValueError('All elements must be numbers.')
 
-if __name__ == '__main__':
-    processor = MainProcessor()
-    processor.main_loop()
+    def perform_calculation(self):
+        return {
+            'sum': sum(self.data),
+            'average': sum(self.data) / len(self.data) if self.data else 0
+        }
