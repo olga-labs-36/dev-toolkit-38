@@ -1,34 +1,33 @@
-from typing import Any, Dict
+import time
 
-class Configuration:
-    def __init__(self, config_data: Dict[str, Any]) -> None:
-        """Initialize configuration with given data."""
-        self.config_data = config_data
+class Performance:
+    def __init__(self):
+        self.start_time = None
+        self.end_time = None
 
-    def get(self, key: str, default: Any = None) -> Any:
-        """Return the value for the given key or default if key not found."""
-        return self.config_data.get(key, default)
+    def start(self):
+        self.start_time = time.perf_counter()
 
-    def set(self, key: str, value: Any) -> None:
-        """Set the value for the given key."""
-        self.config_data[key] = value
+    def stop(self):
+        self.end_time = time.perf_counter()
 
-    def remove(self, key: str) -> None:
-        """Remove the key from the configuration, if present."""
-        self.config_data.pop(key, None)
+    def elapsed_time(self):
+        if self.start_time is None or self.end_time is None:
+            raise ValueError('Timer has not been started or stopped.')
+        return self.end_time - self.start_time
 
-    def items(self) -> Dict[str, Any]:
-        """Return all configuration items as a dictionary."""
-        return self.config_data.items()
+class DataProcessor:
+    def __init__(self, data):
+        self.data = data
 
-    def clear(self) -> None:
-        """Clear all configuration data."""
-        self.config_data.clear()
+    def process(self):
+        perf = Performance()
+        perf.start()
+        result = [x * x for x in self.data]
+        perf.stop()
+        print(f'Processing time: {perf.elapsed_time()} seconds')
+        return result
 
 if __name__ == '__main__':
-    config = Configuration({'host': 'localhost', 'port': 8080})
-    print(config.get('host'))
-    config.set('debug', True)
-    print(config.items())
-    config.remove('port')
-    print(config.items())
+    processor = DataProcessor(range(10000))
+    processed_data = processor.process()
