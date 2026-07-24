@@ -1,23 +1,30 @@
 import re
 
-def is_valid_email(email):
-    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(pattern, email) is not None
+class ValidationError(Exception):
+    pass
 
+def validate_email(email):
+    if not isinstance(email, str):
+        raise ValidationError('Email must be a string.')
+    if not email:
+        raise ValidationError('Email cannot be empty.')
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not re.match(pattern, email):
+        raise ValidationError('Invalid email format.')
+    return True
 
-def is_positive_integer(value):
-    return isinstance(value, int) and value > 0
+def validate_age(age):
+    if not isinstance(age, int):
+        raise ValidationError('Age must be an integer.')
+    if age < 0:
+        raise ValidationError('Age cannot be negative.')
+    return True
 
-
-def is_non_empty_string(value):
-    return isinstance(value, str) and bool(value.strip())
-
-
-def validate_user_data(data):
-    if not is_valid_email(data.get('email', '')):
-        return False, 'Invalid email address'
-    if not is_positive_integer(data.get('age')):
-        return False, 'Age must be a positive integer'
-    if not is_non_empty_string(data.get('username')):
-        return False, 'Username cannot be empty'
-    return True, 'Validation successful'
+def validate_username(username):
+    if not isinstance(username, str):
+        raise ValidationError('Username must be a string.')
+    if not username:
+        raise ValidationError('Username cannot be empty.')
+    if len(username) < 3:
+        raise ValidationError('Username must be at least 3 characters long.')
+    return True
