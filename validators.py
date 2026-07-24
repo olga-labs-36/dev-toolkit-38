@@ -1,30 +1,28 @@
 import re
 
-class ValidationError(Exception):
-    pass
-
 def validate_email(email):
-    if not isinstance(email, str):
-        raise ValidationError('Email must be a string.')
-    if not email:
-        raise ValidationError('Email cannot be empty.')
-    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    if not re.match(pattern, email):
-        raise ValidationError('Invalid email format.')
-    return True
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
-def validate_age(age):
-    if not isinstance(age, int):
-        raise ValidationError('Age must be an integer.')
-    if age < 0:
-        raise ValidationError('Age cannot be negative.')
-    return True
 
-def validate_username(username):
-    if not isinstance(username, str):
-        raise ValidationError('Username must be a string.')
-    if not username:
-        raise ValidationError('Username cannot be empty.')
-    if len(username) < 3:
-        raise ValidationError('Username must be at least 3 characters long.')
-    return True
+def validate_phone(phone):
+    pattern = r'^[+]?[0-9]{1,4}?[-.\s]?\(?(\d{1,3})?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$'
+    return re.match(pattern, phone) is not None
+
+
+def validate_integer(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+
+def validate_input(data):
+    if not validate_email(data.get('email', '')):
+        return False, 'Invalid email address'
+    if not validate_phone(data.get('phone', '')):
+        return False, 'Invalid phone number'
+    if not validate_integer(data.get('age', '')):
+        return False, 'Age must be an integer'
+    return True, 'Input is valid'
