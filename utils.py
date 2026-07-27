@@ -1,31 +1,24 @@
-import json
-
-def load_json(file_path):
-    with open(file_path, 'r') as file:
-        return json.load(file)
+import time
+import requests
 
 
-def save_json(data, file_path):
-    with open(file_path, 'w') as file:
-        json.dump(data, file, indent=4)
+def retry_request(url, retries=3, delay=2):
+    attempt = 0
+    while attempt < retries:
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            return response
+        except requests.exceptions.RequestException:
+            attempt += 1
+            time.sleep(delay)
+    return None
 
 
-def merge_dictionaries(dict1, dict2):
-    result = dict1.copy()
-    result.update(dict2)
-    return result
-
-
-def flatten_dict(nested_dict, parent_key='', sep='_'):
-    items = []
-    for k, v in nested_dict.items():
-        new_key = f'{parent_key}{sep}{k}' if parent_key else k
-        if isinstance(v, dict):
-            items.extend(flatten_dict(v, new_key, sep=sep).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
-
-
-def filter_dict(data_dict, filter_func):
-    return {k: v for k, v in data_dict.items() if filter_func(k, v)}
+if __name__ == '__main__':
+    url = 'https://api.example.com/data'
+    result = retry_request(url)
+    if result:
+        print('Success:', result.json())
+    else:
+        print('Failed to fetch data after retries.')
