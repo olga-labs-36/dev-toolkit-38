@@ -1,50 +1,31 @@
-from typing import List, Dict, Any
+import json
+
+def load_json(file_path):
+    with open(file_path, 'r') as file:
+        return json.load(file)
 
 
-def flatten_dict(nested_dict: Dict[str, Any], parent_key: str = '', sep: str = '_') -> Dict[str, Any]:
-    """Flatten a nested dictionary.
+def save_json(data, file_path):
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)
 
-    Args:
-        nested_dict (Dict[str, Any]): The nested dictionary to flatten.
-        parent_key (str, optional): The base key string. Defaults to ''.
-        sep (str, optional): Separator for flattened keys. Defaults to '_'.
 
-    Returns:
-        Dict[str, Any]: A flattened dictionary.
-    """  
+def merge_dictionaries(dict1, dict2):
+    result = dict1.copy()
+    result.update(dict2)
+    return result
+
+
+def flatten_dict(nested_dict, parent_key='', sep='_'):
     items = []
-    for key, value in nested_dict.items():
-        new_key = f'{parent_key}{sep}{key}' if parent_key else key
-        if isinstance(value, dict):
-            items.extend(flatten_dict(value, new_key, sep=sep).items())
+    for k, v in nested_dict.items():
+        new_key = f'{parent_key}{sep}{k}' if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
         else:
-            items.append((new_key, value))
+            items.append((new_key, v))
     return dict(items)
 
 
-def chunk_list(items: List[Any], chunk_size: int) -> List[List[Any]]:
-    """Split a list into chunks.
-
-    Args:
-        items (List[Any]): The list to split.
-        chunk_size (int): The size of each chunk.
-
-    Returns:
-        List[List[Any]]: A list of chunks.
-    """  
-    return [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]
-
-
-def merge_dicts(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> Dict[str, Any]:
-    """Merge two dictionaries.
-
-    Args:
-        dict1 (Dict[str, Any]): The first dictionary.
-        dict2 (Dict[str, Any]): The second dictionary.
-
-    Returns:
-        Dict[str, Any]: A dictionary containing merged contents.
-    """  
-    merged = dict1.copy()
-    merged.update(dict2)
-    return merged
+def filter_dict(data_dict, filter_func):
+    return {k: v for k, v in data_dict.items() if filter_func(k, v)}
