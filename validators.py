@@ -1,28 +1,28 @@
 import re
 
 def validate_email(email):
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
+    regex = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
+    return re.match(regex, email) is not None
 
 
 def validate_phone(phone):
-    pattern = r'^[+]?[0-9]{1,4}?[-.\s]?\(?(\d{1,3})?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$'
-    return re.match(pattern, phone) is not None
+    regex = r'^\+?1?\d{9,15}$'
+    return re.match(regex, phone) is not None
 
 
-def validate_integer(value):
+def validate_date(date_str):
+    from datetime import datetime
     try:
-        int(value)
+        datetime.strptime(date_str, '%Y-%m-%d')
         return True
     except ValueError:
         return False
 
 
-def validate_input(data):
-    if not validate_email(data.get('email', '')):
-        return False, 'Invalid email address'
-    if not validate_phone(data.get('phone', '')):
-        return False, 'Invalid phone number'
-    if not validate_integer(data.get('age', '')):
-        return False, 'Age must be an integer'
-    return True, 'Input is valid'
+def validate_url(url):
+    regex = r'^(https?://)?(www\.)?([a-z0-9-]+\.[a-z]{2,})(/[\w-./?%&=]*)?$'
+    return re.match(regex, url) is not None
+
+
+def validate_username(username):
+    return 3 <= len(username) <= 30 and username.isalnum()
