@@ -1,33 +1,24 @@
 import time
+import requests
 
-class Performance:
-    def __init__(self):
-        self.start_time = None
-        self.end_time = None
+class NetworkError(Exception):
+    pass
 
-    def start(self):
-        self.start_time = time.perf_counter()
-
-    def stop(self):
-        self.end_time = time.perf_counter()
-
-    def elapsed_time(self):
-        if self.start_time is None or self.end_time is None:
-            raise ValueError('Timer has not been started or stopped.')
-        return self.end_time - self.start_time
-
-class DataProcessor:
-    def __init__(self, data):
-        self.data = data
-
-    def process(self):
-        perf = Performance()
-        perf.start()
-        result = [x * x for x in self.data]
-        perf.stop()
-        print(f'Processing time: {perf.elapsed_time()} seconds')
-        return result
+def retry_request(url, retries=3, delay=2):
+    for attempt in range(retries):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            if attempt < retries - 1:
+                time.sleep(delay)
+            else:
+                raise NetworkError(f'Request failed after {retries} attempts: {e}') from e
 
 if __name__ == '__main__':
-    processor = DataProcessor(range(10000))
-    processed_data = processor.process()
+    try:
+        data = retry_request('https://api.example.com/data')
+        print(data)
+    except NetworkError as e:
+        print(e)
