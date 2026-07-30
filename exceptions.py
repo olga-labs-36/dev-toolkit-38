@@ -1,17 +1,27 @@
-class CustomError(Exception):
+import time
+import functools
+
+class NetworkError(Exception):
     pass
 
-class NotFoundError(CustomError):
-    def __init__(self, message="Not found"): 
-        self.message = message
-        super().__init__(self.message)
+def retry(max_retries=3, delay=2):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except NetworkError as e:
+                    if attempt < max_retries - 1:
+                        time.sleep(delay)
+                    else:
+                        raise e
+        return wrapper
+    return decorator
 
-class ValidationError(CustomError):
-    def __init__(self, message="Invalid input"): 
-        self.message = message
-        super().__init__(self.message)
-
-class DatabaseError(CustomError):
-    def __init__(self, message="Database error occurred"): 
-        self.message = message
-        super().__init__(self.message)
+@retry(max_retries=5, delay=1)
+def fetch_data(url):
+    # Simulate network operation
+    if random.random() < 0.7:
+        raise NetworkError('Failed to fetch data')
+    return {'data': 'sample data'}
