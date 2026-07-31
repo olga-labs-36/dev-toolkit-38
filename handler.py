@@ -1,29 +1,25 @@
 import json
 
-def load_json(file_path):
-    with open(file_path, 'r') as f:
-        return json.load(f)
+class CustomError(Exception):
+    pass
 
+def process_data(data):
+    if not isinstance(data, dict):
+        raise CustomError('Data must be a dictionary')
+    if 'id' not in data:
+        raise CustomError('Missing required key: id')
+    if 'value' not in data:
+        raise CustomError('Missing required key: value')
+    return f'Processed {data['id']} with value {data['value']}'
 
-def save_json(data, file_path):
-    with open(file_path, 'w') as f:
-        json.dump(data, f, indent=4)
-
-
-def update_json(file_path, updates):
-    data = load_json(file_path)
-    data.update(updates)
-    save_json(data, file_path)
-
-
-def get_value(data, key, default=None):
-    return data.get(key, default)
-
-
-def set_value(data, key, value):
-    data[key] = value
-
-
-def delete_key(data, key):
-    if key in data:
-        del data[key]
+def handle_request(request):
+    try:
+        data = json.loads(request)
+        result = process_data(data)
+        return json.dumps({'status': 'success', 'result': result})
+    except json.JSONDecodeError:
+        return json.dumps({'status': 'error', 'message': 'Invalid JSON'}), 400
+    except CustomError as ce:
+        return json.dumps({'status': 'error', 'message': str(ce)}), 400
+    except Exception as e:
+        return json.dumps({'status': 'error', 'message': 'An unexpected error occurred'}), 500
