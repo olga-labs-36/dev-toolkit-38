@@ -1,35 +1,34 @@
-def divide_numbers(numerator, denominator):
-    if not isinstance(numerator, (int, float)):
-        raise ValueError('Numerator must be a number')
-    if not isinstance(denominator, (int, float)):
-        raise ValueError('Denominator must be a number')
-    if denominator == 0:
-        raise ZeroDivisionError('Denominator cannot be zero')
-    return numerator / denominator
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
 
 
-def parse_integer(value):
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        raise ValueError('Invalid integer value')
+def write_file(file_path, content):
+    with open(file_path, 'w') as file:
+        file.write(content)
 
 
-def open_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            return file.read()
-    except FileNotFoundError:
-        raise FileNotFoundError('File not found: ' + file_path)
-    except Exception as e:
-        raise Exception('Error opening file: ' + str(e))
+def list_to_dict(lst, key):
+    return {getattr(item, key): item for item in lst}
 
 
-def safe_list_index(lst, index):
-    if not isinstance(lst, list):
-        raise ValueError('Expected a list')
-    if not isinstance(index, int):
-        raise ValueError('Index must be an integer')
-    if index < 0 or index >= len(lst):
-        raise IndexError('Index out of range')
-    return lst[index]
+def flatten_list(nested_list):
+    return [item for sublist in nested_list for item in sublist]
+
+
+def chunk_list(lst, chunk_size):
+    return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+
+
+def merge_dicts(dict1, dict2):
+    merged = dict1.copy()
+    merged.update(dict2)
+    return merged
+
+
+def dict_to_list(d):
+    return [{'key': k, 'value': v} for k, v in d.items()]
+
+
+def is_empty(value):
+    return value is None or value == ''
