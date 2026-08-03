@@ -1,25 +1,15 @@
-import json
 import os
 
 class Config:
-    def __init__(self, config_file='config.json', defaults=None):
-        self.config_file = config_file
-        self.defaults = defaults or {}
-        self.config = self.load_config()
+    def __init__(self):
+        self.environment = os.getenv('ENVIRONMENT', 'development')
+        self.db_url = os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
+        self.debug = self.environment == 'development'
 
-    def load_config(self):
-        if os.path.exists(self.config_file):
-            with open(self.config_file, 'r') as f:
-                return {**self.defaults, **json.load(f)}
-        return self.defaults
+    def get_db_url(self):
+        return self.db_url
 
-    def get(self, key, default=None):
-        return self.config.get(key, default)
+    def is_debug_mode(self):
+        return self.debug
 
-    def set(self, key, value):
-        self.config[key] = value
-        self.save_config()
-
-    def save_config(self):
-        with open(self.config_file, 'w') as f:
-            json.dump(self.config, f, indent=4)
+config = Config()
