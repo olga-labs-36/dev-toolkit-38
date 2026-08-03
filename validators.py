@@ -1,17 +1,29 @@
-import re
-
-def is_valid_email(email):
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(regex, email) is not None
-
-
-def is_valid_age(age):
-    return isinstance(age, int) and 0 <= age <= 120
-
-
-def validate_user_input(email, age):
-    if not is_valid_email(email):
-        raise ValueError('Invalid email format')
-    if not is_valid_age(age):
-        raise ValueError('Age must be an integer between 0 and 120')
+def validate_input(data):
+    if not isinstance(data, dict):
+        raise ValueError('Input must be a dictionary')
+    if 'name' not in data or not isinstance(data['name'], str):
+        raise ValueError('Missing or invalid name')
+    if 'age' not in data or not isinstance(data['age'], int) or data['age'] < 0:
+        raise ValueError('Missing or invalid age')
     return True
+
+def main_loop(inputs):
+    for data in inputs:
+        try:
+            validate_input(data)
+            process_data(data)
+        except ValueError as ve:
+            print(f'Input error: {ve}')
+        except Exception as e:
+            print(f'Unexpected error: {e}')
+
+def process_data(data):
+    print(f'Processing {data['name']} who is {data['age']} years old')
+
+inputs = [
+    {'name': 'Alice', 'age': 30},
+    {'name': 'Bob', 'age': -5},
+    {'name': 'Charlie'},
+    'Invalid Data',
+]
+main_loop(inputs)
