@@ -1,24 +1,25 @@
-import time
-import requests
+from typing import Any, Dict
 
-class NetworkError(Exception):
-    pass
+class Config:
+    """Configuration manager for application settings."""
+    def __init__(self, settings: Dict[str, Any]) -> None:
+        self.settings = settings
 
-def retry_request(url, retries=3, delay=2):
-    for attempt in range(retries):
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
-            if attempt < retries - 1:
-                time.sleep(delay)
-            else:
-                raise NetworkError(f'Request failed after {retries} attempts: {e}') from e
+    def get(self, key: str, default: Any = None) -> Any:
+        """Retrieve a configuration value by key."""
+        return self.settings.get(key, default)
 
+    def set(self, key: str, value: Any) -> None:
+        """Set a configuration value by key."""
+        self.settings[key] = value
+
+    def all(self) -> Dict[str, Any]:
+        """Return all configuration settings."""
+        return self.settings
+
+# Example usage
 if __name__ == '__main__':
-    try:
-        data = retry_request('https://api.example.com/data')
-        print(data)
-    except NetworkError as e:
-        print(e)
+    config = Config({'debug': True, 'port': 8080})
+    print(config.get('debug'))
+    config.set('port', 9090)
+    print(config.all())
