@@ -1,17 +1,15 @@
 import time
 import requests
+from requests.exceptions import RequestException
 
-class NetworkError(Exception):
-    pass
-
-def retry_request(url, retries=3, delay=1):
+def retry_request(url, retries=3, delay=2):
     for attempt in range(retries):
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException:
+            return response
+        except RequestException:
             if attempt < retries - 1:
                 time.sleep(delay)
-                continue
-            raise NetworkError('Failed to fetch data from {}'.format(url))
+            else:
+                raise
