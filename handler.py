@@ -1,25 +1,27 @@
-import json
+from typing import Any, Dict
 
-class CustomError(Exception):
-    pass
 
-def process_data(data):
+def handle_request(data: Dict[str, Any]) -> str:
+    """Process incoming request data and return response.
+
+    Args:
+        data (Dict[str, Any]): The input data for processing.
+
+    Returns:
+        str: The response message after processing.
+    """
     if not isinstance(data, dict):
-        raise CustomError('Data must be a dictionary')
-    if 'id' not in data:
-        raise CustomError('Missing required key: id')
-    if 'value' not in data:
-        raise CustomError('Missing required key: value')
-    return f'Processed {data['id']} with value {data['value']}'
+        raise ValueError('Data must be a dictionary')
 
-def handle_request(request):
-    try:
-        data = json.loads(request)
-        result = process_data(data)
-        return json.dumps({'status': 'success', 'result': result})
-    except json.JSONDecodeError:
-        return json.dumps({'status': 'error', 'message': 'Invalid JSON'}), 400
-    except CustomError as ce:
-        return json.dumps({'status': 'error', 'message': str(ce)}), 400
-    except Exception as e:
-        return json.dumps({'status': 'error', 'message': 'An unexpected error occurred'}), 500
+    # Simulate processing
+    response = f"Processed data: {data}"
+    return response
+
+
+def log_response(response: str) -> None:
+    """Log the response to the console.
+
+    Args:
+        response (str): The response message to log.
+    """
+    print(f'Response: {response}')
