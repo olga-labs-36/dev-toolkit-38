@@ -1,29 +1,22 @@
 def validate_input(data):
     if not isinstance(data, dict):
         raise ValueError('Input must be a dictionary')
-    if 'name' not in data or not isinstance(data['name'], str):
-        raise ValueError('Missing or invalid name')
-    if 'age' not in data or not isinstance(data['age'], int) or data['age'] < 0:
-        raise ValueError('Missing or invalid age')
+    required_keys = ['name', 'age']
+    for key in required_keys:
+        if key not in data:
+            raise ValueError(f'Missing required key: {key}')
+    if not isinstance(data['name'], str) or not data['name']:
+        raise ValueError('Name must be a non-empty string')
+    if not isinstance(data['age'], int) or data['age'] < 0:
+        raise ValueError('Age must be a non-negative integer')
     return True
 
-def main_loop(inputs):
-    for data in inputs:
+def main_process_loop(data_list):
+    results = []
+    for data in data_list:
         try:
             validate_input(data)
-            process_data(data)
-        except ValueError as ve:
-            print(f'Input error: {ve}')
-        except Exception as e:
-            print(f'Unexpected error: {e}')
-
-def process_data(data):
-    print(f'Processing {data['name']} who is {data['age']} years old')
-
-inputs = [
-    {'name': 'Alice', 'age': 30},
-    {'name': 'Bob', 'age': -5},
-    {'name': 'Charlie'},
-    'Invalid Data',
-]
-main_loop(inputs)
+            results.append(f"Processed: {data['name']}")
+        except ValueError as e:
+            results.append(str(e))
+    return results
